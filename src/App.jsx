@@ -25,8 +25,10 @@ function App() {
 
   return (
     <>
-      <Navbar></Navbar>
-      <Outlet></Outlet>
+    
+      <Navbar/>
+      <Outlet/>
+     
     </>
   )
 }

@@ -21,13 +21,62 @@ const AuthForm = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
- async function handleLogin() {
-    console.log('Logging in',formData)
- }
- async function handleRegister(){
-    console.log('Registering',formData)
- }
-
+  async function handleLogin() {
+    console.log('Logging in', formData);
+    let userData = formData;
+    try{
+      const response = await fetch('http://127.0.0.1:8000/api/login/',{
+        method: 'POST',
+        headers:{
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: userData.email,
+          password: userData.password,
+          username: userData.email,
+        })
+      })
+      if (!response.ok){
+        throw new Error('login falied')
+      }
+      const data = await response.json();
+      console.log('Login successful', data);
+      localStorage.setItem("user", JSON.stringify(data));
+      setUser(data);
+      navigate("/");
+    }catch(error){
+      console.log('error during login',error)
+    }
+  }
+  async function handleRegister() {
+    console.log('Registering', formData);
+    let userData = formData;
+    try{
+      const response = await fetch('http://127.0.0.1:8000/api/register/',{
+        method: 'POST',
+        headers: {
+          'Content-Type':'application/json',          
+        },
+        body: JSON.stringify({
+          email: userData.email,
+          password: userData.password,
+          username: userData.email,
+          full_name: userData.name
+        })
+      
+      })
+      if (!response.ok){
+        throw new Error('Registration failed')
+      }
+      const data = await response.json();
+      console.log('Register successful', data);
+      localStorage.setItem("user", JSON.stringify(data));
+      setUser(data);
+      navigate("/");
+  }catch(error){
+    console.log("An error occurred", error)
+  }
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isLogin) {
@@ -80,6 +129,7 @@ const AuthForm = () => {
       </p>
     </div>
   );
+
 };
 
 export default AuthForm;
