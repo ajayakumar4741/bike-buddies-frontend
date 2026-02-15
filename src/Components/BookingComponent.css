@@ -52,7 +52,7 @@
   background: #f8b996aa;
 }
 
-.book-rooms-button {
+.book-bikes-button {
   margin-top: 15px;
   background: #101a1b;
   color: #f8b996;
@@ -64,7 +64,7 @@
   border-radius: 5px;
   transition: 0.1s ease-in-out;
 }
-.book-rooms-button:hover {
+.book-bikes-button:hover {
   background-color: #f8b996;
   color: #101a1b;
 }
@@ -77,7 +77,7 @@
   margin-top: 10px;
   text-align: center;
 }
-.book-room-button {
+.book-bike-button {
   display: inline-block;
   padding: 0.8rem 1.5rem;
   font-size: 1.2rem;
@@ -93,23 +93,23 @@
   margin: 1rem auto;
 }
 
-.book-room-button:hover {
+.book-bike-button:hover {
   background-color: #0056b3;
   transform: translateY(-2px);
 }
 
-.book-room-button:active {
+.book-bike-button:active {
   background-color: #003f8a;
   transform: translateY(1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.book-room-button:disabled {
+.book-bike-button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
 }
 
-.book-room-button:focus {
+.book-bike-button:focus {
   outline: 2px solid #0056b3;
   outline-offset: 2px;
 }

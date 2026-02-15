@@ -6,13 +6,19 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { UserProvider } from './Components/UserContext.jsx';
 import GuestRoute from './Components/GuestRoute.jsx';
 import AuthForm from './Components/AuthForm.jsx';
+import BookingComponent from './Components/BookingComponent.jsx';
 
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App></App>,
-    children: [{
+    children: [
+      {
+        path: "/",
+        element: <BookingComponent></BookingComponent>,
+      },
+      {
       path:'/auth',
       element: (
         <GuestRoute> <AuthForm></AuthForm> </GuestRoute>
