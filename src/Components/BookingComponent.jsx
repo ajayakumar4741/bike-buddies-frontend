@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import './BookingComponent.css';
+import BikeCard from './BikeDetails/BikeCard';
 
 const BookingComponent = ({currentUser}) => {
   const [selectedDates, setSelectedDates] = useState({
@@ -32,6 +33,7 @@ const BookingComponent = ({currentUser}) => {
         console.error("Error fetching ride data:", err);
       }
     }
+    fetchRideData();
   },[])
 
   const handleDateClick = (day, monthOffset = 0) => {
@@ -147,7 +149,7 @@ const BookingComponent = ({currentUser}) => {
     };
 
     const availableRides = rideData.filter((bike) =>
-      bike.occupiedDates.every((occ) => !isDateInRange(occ.date))
+      (bike.occupiedDates || []).every((occ) => !isDateInRange(occ.date))
     );
 
     setFilteredBikes(availableRides);
