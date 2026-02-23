@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 const BikeImageSlider = ({images}) => {
     const [currentIndex, setCurrentIndex] = useState(0);
