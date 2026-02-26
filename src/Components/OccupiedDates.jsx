@@ -6,6 +6,8 @@ const OccupiedDates = () => {
     const { user } = useContext(UserContext);
     const [groupedDates, setGroupedDates] = React.useState([]);
 
+    
+
     React.useEffect(() => {
         console.log(user)
         if (!user){
@@ -13,6 +15,37 @@ const OccupiedDates = () => {
         }
     }, [])
     const baseUrl = "http://localhost:8000";
+    
+    const handleCancelBooking = async ({ bookingId }) => {
+  if (!user) {
+    return navigate("/auth");
+  }
+
+  try {
+    // Example: call your backend API to cancel the booking
+    const response = await fetch(`${baseUrl}/api/bookings/${bookingId}/cancel/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`, // if you use JWT
+      },
+      body: JSON.stringify({ userId: user.user.id }),
+    });
+
+    if (response.ok) {
+      // Notify parent component or update state
+      if (onBookingSuccess) {
+        onBookingSuccess(null); // clear booking
+      }
+      // Navigate back to bikes page or dashboard
+      navigate("/bikes");
+    } else {
+      console.error("Failed to cancel booking");
+    }
+  } catch (error) {
+    console.error("Error cancelling booking:", error);
+  }
+};
     async function fetchDates(){
         try {
             const response = await fetch(`${baseUrl}/api/occupied-dates/`, {
@@ -107,6 +140,7 @@ const OccupiedDates = () => {
       processAndSetDates(); // Fetch and process dates
     }, [user]);
   return (
+    <>
      <div className="occupied-dates-container">
       {Object.keys(groupedDates).map((month) => (
         <div key={month} className="month-section">
@@ -118,12 +152,19 @@ const OccupiedDates = () => {
                   {new Date(range.startDate).toLocaleDateString("en-IN")} -{" "}
                   {new Date(range.endDate).toLocaleDateString("en-IN")}
                 </p>
+                <button
+          className="btn cancel-btn"
+          onClick={() => handleCancelBooking({ bookingId: range.bookingId })}
+        >
+          Cancel Booking
+        </button>
               </div>
             ))}
           </div>
         </div>
       ))}
     </div>
+    </>
   )
 }
 
