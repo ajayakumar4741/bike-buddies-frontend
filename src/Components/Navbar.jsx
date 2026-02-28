@@ -18,6 +18,13 @@ const Navbar = () => {
     setIsOpen(!isOpen);
   }
 
+  // Safely extract name
+  const displayName =
+    user?.user?.full_name ||
+    user?.user?.username ||
+    user?.user?.email ||
+    "";
+
   return (
     <>
       <nav className="navbar">
@@ -29,23 +36,31 @@ const Navbar = () => {
           <li>
             <Link to="all-bikes">All Bikes</Link>
           </li>
+
           {user && (
-            <li>
-              <Link to="my-rides">My Rides</Link>
-            </li>
+            <>
+              <li>
+                <Link to="my-rides">My Rides</Link>
+              </li>
+
+              {/* 👇 Show Username */}
+              <li className="username">
+                Hello, {displayName}
+              </li>
+
+              <li style={{ cursor: "pointer" }} onClick={handleLogout}>
+                Logout
+              </li>
+            </>
           )}
-          {user ? (
-            <li style={{ cursor: "pointer" }} onClick={handleLogout}>
-              Logout
-            </li>
-          ) : (
+
+          {!user && (
             <li>
               <Link to="auth">Login</Link>
             </li>
           )}
         </ul>
 
-        {/* Hamburger */}
         <div
           className={`hamburger ${isOpen ? "hamburger-active" : ""}`}
           onClick={toggleNav}
@@ -56,7 +71,6 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
       <div className={`menubar ${isOpen ? "active" : ""}`}>
         <ul>
           <li>
@@ -65,16 +79,24 @@ const Navbar = () => {
           <li>
             <Link to="all-bikes">All Bikes</Link>
           </li>
+
           {user && (
-            <li>
-              <Link to="my-rides">My Rides</Link>
-            </li>
+            <>
+              <li>
+                <Link to="my-rides">My Rides</Link>
+              </li>
+
+              <li className="username">
+                Hello, {displayName}
+              </li>
+
+              <li style={{ cursor: "pointer" }} onClick={handleLogout}>
+                Logout
+              </li>
+            </>
           )}
-          {user ? (
-            <li style={{ cursor: "pointer" }} onClick={handleLogout}>
-              Logout
-            </li>
-          ) : (
+
+          {!user && (
             <li>
               <Link to="auth">Login</Link>
             </li>

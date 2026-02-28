@@ -16,18 +16,20 @@ const BikeCard = ({bike, selectedDateRange, onBookingSuccess}) => {
             return navigate('/auth');            
         }
         const start = new Date(selectedDateRange.startDate);
-  const end = new Date(selectedDateRange.endDate);
+        // default end to start if not selected
+        const end = selectedDateRange.endDate ? new Date(selectedDateRange.endDate) : new Date(start);
 
-  // Difference in days (inclusive)
-  const diffInTime = end.getTime() - start.getTime();
-  const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24)) + 1;
+        // Difference in days (inclusive)
+        const diffInTime = end.getTime() - start.getTime();
+        const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24)) + 1;
 
-  // Calculate total price
-  const bikePrice = bike.pricePerRide * diffInDays;
+        // Calculate total price
+        const bikePrice = bike.pricePerRide * diffInDays;
 
         // Navigate to payment home page with booking details
         navigate('/payment-home', { 
             state: { 
+                
                 bikeId: bikeId,
                 userId: userId,
                 selectedDateRange: selectedDateRange,
