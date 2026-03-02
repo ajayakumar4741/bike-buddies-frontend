@@ -11,11 +11,11 @@ const OccupiedDates = () => {
 
   // Format for display only (dd-mm-yyyy)
   const formatDisplayDate = (dateStr) => {
-    const d = new Date(dateStr);
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const d = new Date(dateStr + "T00:00:00");
+    const day = String(d.getDate())
+    const month = String(d.getMonth() + 1)
     const year = d.getFullYear();
-    return `${day}-${month}-${year}`;
+    return `${day}/${month}/${year}`;
   };
 
   // Cancel a date range (backend expects YYYY-MM-DD)
@@ -94,52 +94,58 @@ const OccupiedDates = () => {
     }
   }
 
-  // Group consecutive dates into ranges
-  async function processAndSetDates() {
-    const fetchedDates = await fetchDates();
-    const dateStrings = fetchedDates.map((entry) => entry.date).sort();
+  
+async function processAndSetDates() {
+  const fetchedDates = await fetchDates();
+  const dateStrings = fetchedDates.map((entry) => entry.date).sort();
 
-    const ranges = {};
-    let currentMonth = "";
-    let currentRange = null;
+  const ranges = {};
+  let currentMonth = "";
+  let currentRange = null;
 
-    dateStrings.forEach((dateStr) => {
-      const parsedDate = new Date(`${dateStr}T00:00:00`);
-      if (isNaN(parsedDate.getTime())) return;
+  dateStrings.forEach((dateStr) => {
+    // Parse safely as LOCAL date
+    const parsedDate = new Date(dateStr);
 
-      const month = parsedDate.toLocaleString("en-IN", {
-        month: "long",
-        year: "numeric",
-      });
+    if (isNaN(parsedDate.getTime())) return;
 
-      if (month !== currentMonth) {
-        if (currentRange) {
-          if (!ranges[currentMonth]) ranges[currentMonth] = [];
-          ranges[currentMonth].push(currentRange);
-        }
-        currentMonth = month;
-        currentRange = { startDate: dateStr, endDate: dateStr };
-      } else {
-        const prevDate = new Date(`${currentRange.endDate}T00:00:00`);
-        prevDate.setDate(prevDate.getDate() + 1);
-
-        if (parsedDate.toISOString().split("T")[0] === prevDate.toISOString().split("T")[0]) {
-          currentRange.endDate = dateStr;
-        } else {
-          if (!ranges[currentMonth]) ranges[currentMonth] = [];
-          ranges[currentMonth].push(currentRange);
-          currentRange = { startDate: dateStr, endDate: dateStr };
-        }
-      }
+    const month = parsedDate.toLocaleString("en-IN", {
+      month: "long",
+      year: "numeric",
     });
 
-    if (currentRange) {
-      if (!ranges[currentMonth]) ranges[currentMonth] = [];
-      ranges[currentMonth].push(currentRange);
-    }
+    if (month !== currentMonth) {
+      if (currentRange) {
+        if (!ranges[currentMonth]) ranges[currentMonth] = [];
+        ranges[currentMonth].push(currentRange);
+      }
 
-    setGroupedDates(ranges);
+      currentMonth = month;
+      currentRange = { startDate: dateStr, endDate: dateStr };
+    } else {
+      // Create next-day check WITHOUT using toISOString
+      const prevDate = new Date(currentRange.endDate + "T00:00:00");
+      prevDate.setDate(prevDate.getDate() + 1);
+
+      const nextDayString = prevDate.toLocaleDateString("en-CA"); // YYYY-MM-DD
+
+      if (dateStr === nextDayString) {
+        currentRange.endDate = dateStr;
+      } else {
+        if (!ranges[currentMonth]) ranges[currentMonth] = [];
+        ranges[currentMonth].push(currentRange);
+        currentRange = { startDate: dateStr, endDate: dateStr };
+      }
+    }
+  });
+
+  if (currentRange) {
+    if (!ranges[currentMonth]) ranges[currentMonth] = [];
+    ranges[currentMonth].push(currentRange);
   }
+
+  setGroupedDates(ranges);
+}
 
   useEffect(() => {
     if (user) processAndSetDates();
@@ -148,9 +154,14 @@ const OccupiedDates = () => {
   return (
     <div className="occupied-dates-container">
       <div className="actions">
-        <button className="btn cancel-all-btn" onClick={handleCancelAll}>
-          Cancel All Bookings
-        </button>
+        {Object.keys(groupedDates).length > 0 ? (
+          <button className="btn cancel-all-btn" onClick={handleCancelAll}>
+            Cancel All Bookings
+          </button>
+        ) : (
+          <p>No Bookings</p>
+        )}
+        
       </div>
       {Object.keys(groupedDates).map((month) => (
         <div key={month} className="month-section">

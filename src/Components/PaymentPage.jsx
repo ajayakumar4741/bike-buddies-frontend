@@ -24,7 +24,7 @@ const getStripe = async () => {
 
 const PaymentPage = () => {
   const location = useLocation();
-  const { clientSecret, amount, currency } = location.state || {};
+  const { clientSecret, amount, currency, bookingData } = location.state || {};
   const [stripe, setStripe] = useState(null);
   const [options, setOptions] = useState(null);
   const [stripeError, setStripeError] = useState(null);
@@ -84,7 +84,7 @@ const PaymentPage = () => {
           </div>
         ) : stripe && options ? (
           <Elements stripe={stripe} options={options}>
-            <PaymentForm />
+            <PaymentForm bookingData={bookingData} amount={amount} currency={currency} />
           </Elements>
         ) : (
           <div className="loading-container">

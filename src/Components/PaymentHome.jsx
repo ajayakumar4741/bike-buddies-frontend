@@ -16,45 +16,6 @@ const PaymentHome = () => {
   // Convert bike price to cents (bikePrice is assumed to be in dollars/units)
   const amount = bookingData?.bikePrice ? Math.round(bookingData.bikePrice * 100) : 5000; // in cents
 
-  const createBooking = async (bookingData) => {
-    const { bikeId, userId, selectedDateRange } = bookingData;
-    const baseURL = "http://127.0.0.1:8000";
-    const bikeUrl = `${baseURL}/api/bikes/${bikeId}/`;
-    const userUrl = `${baseURL}/api/users/${userId}/`;
-    
-    if (selectedDateRange.startDate && !selectedDateRange.endDate) {
-      selectedDateRange.endDate = selectedDateRange.startDate;
-    }
-
-    for (
-      let currentDate = new Date(selectedDateRange.startDate);
-      currentDate <= new Date(selectedDateRange.endDate);
-      currentDate.setDate(currentDate.getDate() + 1)
-    ) {
-      try {
-        const response = await fetch(`${baseURL}/api/occupied-dates/`, {
-          method: "POST",
-          headers: {
-            'Content-Type': "application/json",
-            Authorization: `Token ${user.token}`,
-          },
-          body: JSON.stringify({
-            bike: bikeUrl,
-            user: userUrl,
-            date: currentDate.toISOString().split("T")[0],
-          })
-        });
-        
-        if (!response.ok) {
-          throw new Error("Failed to book ride");
-        }
-        const data = await response.json();
-        console.log("Booking successful:", data);
-      } catch (error) {
-        console.error("Booking failed:", error);
-      }
-    }
-  };
 
   const handlePayClick = async (email) => {
     setLoading(true);
@@ -80,14 +41,17 @@ const PaymentHome = () => {
       console.log("Payment intent response:", data);
       
       if (data.clientSecret) {
-        // Create booking first
-        if (bookingData) {
-          await createBooking(bookingData);
-        }
-        
-        // Then navigate to payment page
+        // navigate to payment page; actual booking will be created
+        // _after_ the payment is confirmed successfully.
         console.log("Navigating to payment page");
-        navigate("/payment", { state: { clientSecret: data.clientSecret, amount: amount, currency: currency } });
+        navigate("/payment", {
+          state: {
+            clientSecret: data.clientSecret,
+            amount: amount,
+            currency: currency,
+            bookingData: bookingData,    // forward the booking info
+          },
+        });
       } else {
         alert("Error creating payment intent: " + (data.error || "Unknown error"));
       }
